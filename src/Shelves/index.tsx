@@ -3,7 +3,7 @@ import { ShelvesCanvas } from './components/ShelvesCanvas/ShelvesCanvas';
 import { useState } from 'react';
 import { Shelf, ShelvesDefinition, Shelves as ShelvesType } from './types';
 import { mapShelvesApiToUI } from './utils/mappers';
-import ShelvesProvider from './components/Providers/ShelvesContextProvider';
+import ShelvesProvider from './Providers/ShelvesContextProvider';
 
 type Props = {
   shelvesDefinition: ShelvesDefinition;

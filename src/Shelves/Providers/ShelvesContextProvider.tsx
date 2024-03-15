@@ -1,5 +1,5 @@
 import { createContext, useState, ReactNode } from 'react';
-import { Shelf } from '../../types';
+import { Shelf } from '../types';
 
 interface ShelvesContextType {
   activeShelf: Shelf | null;

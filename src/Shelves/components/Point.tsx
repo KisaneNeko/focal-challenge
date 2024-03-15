@@ -1,15 +1,17 @@
 import Konva from 'konva';
 import { Circle } from 'react-konva';
-import { Coordinates } from '../../types';
-import { ACTIVE_COLOR } from '../../constants';
+import { Coordinates } from '../types';
+import { ACTIVE_COLOR } from '../constants';
+
+type KonvaMouseEvent = Konva.KonvaEventObject<MouseEvent>;
 
 type Props = {
   color: string;
   coordinates: Coordinates;
   isActive?: boolean;
   onClick: () => void;
-  onDragMove?: (event: Konva.KonvaEventObject<MouseEvent>) => void;
-  onDragStart?: (event: Konva.KonvaEventObject<MouseEvent>) => void;
+  onDragMove?: (event: KonvaMouseEvent) => void;
+  onDragStart?: (event: KonvaMouseEvent) => void;
 };
 
 export const Point = ({

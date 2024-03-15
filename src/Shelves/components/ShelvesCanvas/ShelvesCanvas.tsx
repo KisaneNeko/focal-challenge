@@ -27,7 +27,11 @@ export const ShelvesCanvas = ({ shelves, addShelf, deleteShelf }: Props) => {
           <>
             {shelfDraftProps && <Rect {...shelfDraftProps} />}
             {shelves.map((shelf) => (
-              <Shelf shelf={shelf} key={shelf.color} deleteShelf={deleteShelf} />
+              <Shelf
+                shelf={shelf}
+                key={shelf.color}
+                deleteShelf={deleteShelf}
+              />
             ))}
           </>
         </Layer>
