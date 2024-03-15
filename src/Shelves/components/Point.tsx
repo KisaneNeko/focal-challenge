@@ -12,15 +12,14 @@ type Props = {
   onClick: () => void;
   onDragMove?: (event: KonvaMouseEvent) => void;
   onDragStart?: (event: KonvaMouseEvent) => void;
+  onDragEnd?: (event: KonvaMouseEvent) => void;
 };
 
 export const Point = ({
   color,
   coordinates,
   isActive,
-  onClick,
-  onDragMove,
-  onDragStart,
+  ...restProps
 }: Props) => {
   const [pointX, pointY] = coordinates;
 
@@ -32,10 +31,8 @@ export const Point = ({
       strokeWidth={5}
       fill={color}
       radius={10}
-      onClick={onClick}
-      draggable={!!onDragMove}
-      onDragMove={onDragMove}
-      onDragStart={onDragStart}
+      draggable
+      {...restProps}
     />
   );
 };

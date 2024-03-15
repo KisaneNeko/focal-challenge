@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useRef, useState } from 'react';
 import Konva from 'konva';
-import { getRandomColor } from "../../../utils/utils";
-import { getShelfCoords } from "./shelvesCanvas.utils";
-import { Coordinates, Shelf } from "../../types";
+import { getRandomColor } from '../../../utils/utils';
+import { getShelfCoords } from './shelvesCanvas.utils';
+import { Coordinates, Shelf } from '../../types';
+import { useShelvesContext } from '../../Providers/useShelvesContext';
 
-type AddShelf = (shelf: Shelf) => void;
-export const useShelvesCanvas = (addShelf: AddShelf) => {
+export const useShelvesCanvas = () => {
+  const { addShelf } = useShelvesContext();
   const [initialPointPosition, setInitialPointPosition] = useState<
     [number, number] | null
   >(null);
   const [color, setColor] = useState(getRandomColor());
-  const [shelfDraftProps, setShelfDraftProps] = useState<Konva.RectConfig | null>(
-    null,
-  );
+  const [shelfDraftProps, setShelfDraftProps] =
+    useState<Konva.RectConfig | null>(null);
   const colorOpacity40 = `${color}40`;
+  const canvasRef = useRef(null);
 
   const drawShelfDraft = (
     [initX, initY]: Coordinates,
@@ -27,23 +28,24 @@ export const useShelvesCanvas = (addShelf: AddShelf) => {
       stroke: color,
       fill: colorOpacity40,
       strokeWidth: 5,
-      dash: [10, 10]
+      dash: [10, 10],
     });
   };
 
   const onMouseDown = (event: Konva.KonvaEventObject<MouseEvent>) => {
-    setInitialPointPosition([event.evt.offsetX, event.evt.offsetY]);
-  }
+    if (event.target === canvasRef.current) {
+      setInitialPointPosition([event.evt.offsetX, event.evt.offsetY]);
+    }
+  };
 
   const onMouseUp = () => {
     if (initialPointPosition) {
       const coordinates = getShelfCoords(shelfDraftProps);
       if (coordinates) {
         const newShelf: Shelf = {
-          coordinates, 
-          color
+          coordinates,
+          color,
         };
-
         addShelf(newShelf);
         setColor(getRandomColor());
       }
@@ -51,7 +53,7 @@ export const useShelvesCanvas = (addShelf: AddShelf) => {
       setInitialPointPosition(null);
       setShelfDraftProps(null);
     }
-  }
+  };
 
   const onMouseMove = (event: Konva.KonvaEventObject<MouseEvent>) => {
     if (initialPointPosition) {
@@ -60,12 +62,13 @@ export const useShelvesCanvas = (addShelf: AddShelf) => {
         event.evt.offsetY,
       ]);
     }
-  }
+  };
 
   return {
+    canvasRef,
     onMouseDown,
     onMouseUp,
     onMouseMove,
-    shelfDraftProps
-  }
-}
+    shelfDraftProps,
+  };
+};

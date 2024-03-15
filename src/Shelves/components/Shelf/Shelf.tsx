@@ -1,17 +1,18 @@
 import { Line } from 'react-konva';
 import { Coordinates, Shelf as ShelfType } from '../../types';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Point } from '../Point';
 import { DeleteButton } from '../DeleteButton';
 import { useShelf } from './shelf.hooks';
+import { useShelvesContext } from '../../Providers/useShelvesContext';
 
 type Props = {
   shelf: ShelfType;
-  deleteShelf: (shelf: ShelfType) => void;
 };
 
-export const Shelf = ({ shelf, deleteShelf }: Props) => {
+const ShelfInner = ({ shelf }: Props) => {
   const [activePoint, setActivePoint] = useState<Coordinates | null>(null);
+  const { deleteShelf } = useShelvesContext();
 
   const {
     colorProps,
@@ -19,6 +20,8 @@ export const Shelf = ({ shelf, deleteShelf }: Props) => {
     deleteButtonPosition,
     isActive,
     setActiveShelf,
+    updateShelfCoordinates,
+    submitShelf,
   } = useShelf(shelf);
 
   return (
@@ -31,8 +34,18 @@ export const Shelf = ({ shelf, deleteShelf }: Props) => {
         strokeWidth={5}
         {...colorProps}
       />
-      {isActive ? (
-        shelf.coordinates.map((point) => {
+
+      {!isActive && (
+        <DeleteButton
+          x={deleteButtonPosition[0]}
+          y={deleteButtonPosition[1]}
+          onClick={() => deleteShelf(shelf)}
+          color={shelf.color}
+        />
+      )}
+
+      {isActive &&
+        shelf.coordinates.map((point, index) => {
           const [pointX, pointY] = point;
 
           return (
@@ -43,18 +56,15 @@ export const Shelf = ({ shelf, deleteShelf }: Props) => {
               isActive={activePoint === point}
               onClick={() => setActivePoint(point)}
               onDragStart={() => setActivePoint(point)}
-              onDragMove={() => console.log('Im dragging point')}
+              onDragMove={({ evt }) => {
+                updateShelfCoordinates([evt.offsetX, evt.offsetY], index);
+              }}
+              onDragEnd={submitShelf}
             />
           );
-        })
-      ) : (
-        <DeleteButton
-          x={deleteButtonPosition[0]}
-          y={deleteButtonPosition[1]}
-          onClick={() => deleteShelf(shelf)}
-          color={shelf.color}
-        />
-      )}
+        })}
     </>
   );
 };
+
+export const Shelf = memo(ShelfInner);
