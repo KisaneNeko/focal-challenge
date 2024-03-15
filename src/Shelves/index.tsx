@@ -9,11 +9,8 @@ type Props = {
   onChange: (shelvesDefinition: ShelvesDefinition) => void;
 };
 
-export const Shelves = ({ shelvesDefinition, imgUrl }: Props) => (
-  <ShelvesProvider
-    shelvesDefinition={shelvesDefinition}
-    onChange={(def) => console.log(def)}
-  >
+export const Shelves = ({ shelvesDefinition, imgUrl, onChange }: Props) => (
+  <ShelvesProvider shelvesDefinition={shelvesDefinition} onChange={onChange}>
     <div className="shelves-container">
       <img src={imgUrl} alt="shelf image" />
       <ShelvesCanvas />

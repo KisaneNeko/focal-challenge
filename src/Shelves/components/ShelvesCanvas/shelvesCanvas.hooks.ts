@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import Konva from 'konva';
 import { getRandomColor } from '../../../utils/utils';
 import { getShelfCoords } from './shelvesCanvas.utils';
-import { Coordinates, Shelf } from '../../types';
+import { Coordinates, KonvaMouseEvent, Shelf } from '../../types';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
 
 export const useShelvesCanvas = () => {
@@ -32,7 +32,7 @@ export const useShelvesCanvas = () => {
     });
   };
 
-  const onMouseDown = (event: Konva.KonvaEventObject<MouseEvent>) => {
+  const onMouseDown = (event: KonvaMouseEvent) => {
     if (event.target === canvasRef.current) {
       setInitialPointPosition([event.evt.offsetX, event.evt.offsetY]);
     }
@@ -55,7 +55,7 @@ export const useShelvesCanvas = () => {
     }
   };
 
-  const onMouseMove = (event: Konva.KonvaEventObject<MouseEvent>) => {
+  const onMouseMove = (event: KonvaMouseEvent) => {
     if (initialPointPosition) {
       drawShelfDraft(initialPointPosition, [
         event.evt.offsetX,

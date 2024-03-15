@@ -54,7 +54,6 @@ const ShelfInner = ({ shelf }: Props) => {
               color={shelf.color}
               coordinates={point}
               isActive={activePoint === point}
-              onClick={() => setActivePoint(point)}
               onDragStart={() => setActivePoint(point)}
               onDragMove={({ evt }) => {
                 updateShelfCoordinates([evt.offsetX, evt.offsetY], index);

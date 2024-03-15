@@ -43,6 +43,8 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
     const updateShelf = (shelf: Shelf, updatedProps: Partial<Shelf>) => {
       setShelves((prevState) => {
         const index = prevState.findIndex((s) => s === shelf);
+        const wasActive = activeShelf === shelf;
+
         const updatedShelf = {
           ...shelf,
           ...updatedProps,
@@ -51,12 +53,16 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
         const updatedState = [...prevState];
         updatedState[index] = updatedShelf;
 
+        if (wasActive) {
+          setActiveShelf(updatedShelf);
+        }
+
         return updatedState;
       });
     };
 
     return { addShelf, deleteShelf, updateShelf };
-  }, []);
+  }, [activeShelf]);
 
   const contextValue: ShelvesContextType = {
     activeShelf,

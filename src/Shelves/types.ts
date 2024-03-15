@@ -1,8 +1,12 @@
+import Konva from 'konva';
+
+export type KonvaMouseEvent = Konva.KonvaEventObject<MouseEvent>;
+
 export type Coordinates = [number, number];
 export type ShelvesDefinition = Coordinates[][];
 
 export type Shelf = {
-  coordinates: Coordinates[],
+  coordinates: Coordinates[];
   color: string;
 };
 
