@@ -6,7 +6,7 @@ import { Coordinates, KonvaMouseEvent, Shelf } from '../../types';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
 
 export const useShelvesCanvas = () => {
-  const { addShelf } = useShelvesContext();
+  const { addShelf, setActiveShelf } = useShelvesContext();
   const [initialPointPosition, setInitialPointPosition] = useState<
     [number, number] | null
   >(null);
@@ -35,6 +35,7 @@ export const useShelvesCanvas = () => {
   const onMouseDown = (event: KonvaMouseEvent) => {
     if (event.target === canvasRef.current) {
       setInitialPointPosition([event.evt.offsetX, event.evt.offsetY]);
+      setActiveShelf(null);
     }
   };
 

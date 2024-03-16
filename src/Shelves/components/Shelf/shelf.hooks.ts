@@ -6,8 +6,9 @@ import { getShelfColors } from './shelf.utils';
 const DELETE_TRIGGERS = ['Delete', 'Backspace'];
 
 export const useShelf = (shelf: Shelf) => {
-  const { activeShelf, setActiveShelf, updateShelf, deleteShelf } =
-    useShelvesContext();
+  const { activeShelf, setActiveShelf, updateShelf } = useShelvesContext();
+  useShelfEvents(shelf);
+
   const [coordinates, setCoordinates] = useState<Coordinates[]>(
     shelf.coordinates,
   );
@@ -17,18 +18,6 @@ export const useShelf = (shelf: Shelf) => {
   );
   const isActive = activeShelf === shelf;
   const colorProps = getShelfColors(isActive, shelf.color);
-
-  useEffect(() => {
-    const onKeyPress = (event: globalThis.KeyboardEvent) => {
-      if (isActive && DELETE_TRIGGERS.includes(event.code)) {
-        deleteShelf(shelf);
-      }
-    };
-
-    document.addEventListener('keydown', onKeyPress);
-
-    return () => document.removeEventListener('keydown', onKeyPress);
-  }, [deleteShelf, isActive, shelf]);
 
   const updateShelfCoordinates = (updatedPoint: Coordinates, index: number) => {
     setCoordinates((prevState) => {
@@ -52,4 +41,27 @@ export const useShelf = (shelf: Shelf) => {
     updateShelfCoordinates,
     submitShelf,
   };
+};
+
+const useShelfEvents = (shelf: Shelf) => {
+  const { activeShelf, deleteShelf, setActiveShelf } = useShelvesContext();
+  const isActive = activeShelf === shelf;
+
+  useEffect(() => {
+    const onKeyPress = (event: globalThis.KeyboardEvent) => {
+      if (!isActive) return;
+
+      if (DELETE_TRIGGERS.includes(event.code)) {
+        deleteShelf(shelf);
+      }
+
+      if (event.code === 'Escape') {
+        setActiveShelf(null);
+      }
+    };
+
+    document.addEventListener('keydown', onKeyPress);
+
+    return () => document.removeEventListener('keydown', onKeyPress);
+  }, [deleteShelf, isActive, setActiveShelf, shelf]);
 };

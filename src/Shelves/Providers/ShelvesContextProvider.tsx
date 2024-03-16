@@ -4,7 +4,7 @@ import { mapShelvesApiToUI, mapShelvesUIToApi } from '../utils/mappers';
 
 interface ShelvesContextType {
   activeShelf: Shelf | null;
-  setActiveShelf: (shelf: Shelf) => void;
+  setActiveShelf: (shelf: Shelf | null) => void;
   shelves: Shelves;
   addShelf: (shelf: Shelf) => void;
   deleteShelf: (shelf: Shelf) => void;
