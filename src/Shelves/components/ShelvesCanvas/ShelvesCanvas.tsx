@@ -6,18 +6,26 @@ import { useShelvesContext } from '../../Providers/useShelvesContext';
 
 export const ShelvesCanvas = () => {
   const { shelves } = useShelvesContext();
-  const { canvasRef, onMouseDown, onMouseUp, onMouseMove, shelfDraftProps } =
-    useShelvesCanvas();
+  const {
+    stageRef,
+    startDrawingShelf,
+    submitShelfDraft,
+    redrawShelfDraft,
+    shelfDraftProps,
+  } = useShelvesCanvas();
 
   return (
     <div className="shelves-canvas-container">
       <Stage
-        ref={canvasRef}
+        ref={stageRef}
         width={window.innerWidth}
         height={window.innerHeight}
-        onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onMouseMove={onMouseMove}
+        onMouseDown={startDrawingShelf}
+        onTouchStart={startDrawingShelf}
+        onMouseUp={submitShelfDraft}
+        onTouchEnd={submitShelfDraft}
+        onMouseMove={redrawShelfDraft}
+        onTouchMove={redrawShelfDraft}
       >
         <Layer>
           <>

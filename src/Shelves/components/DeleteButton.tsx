@@ -4,10 +4,11 @@ type Props = {
   x: number;
   y: number;
   onClick: () => void;
+  onTouchEnd: () => void;
   color: string;
 };
-export const DeleteButton = ({ x, y, onClick, color }: Props) => (
-  <Group x={x} y={y} onClick={onClick}>
+export const DeleteButton = ({ color, ...groupProps }: Props) => (
+  <Group {...groupProps}>
     <Circle fill={color} radius={10} />
     <Text
       x={-4}

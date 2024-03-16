@@ -1,4 +1,13 @@
-import { createContext, useState, ReactNode, useEffect, useMemo } from 'react';
+import Konva from 'konva';
+import {
+  createContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  RefObject,
+} from 'react';
 import { Shelf, Shelves, ShelvesDefinition } from '../types';
 import { mapShelvesApiToUI, mapShelvesUIToApi } from '../utils/mappers';
 
@@ -7,6 +16,7 @@ interface ShelvesContextType {
   setActiveShelf: (shelf: Shelf | null) => void;
   shelves: Shelves;
   addShelf: (shelf: Shelf) => void;
+  stageRef: RefObject<Konva.Stage>;
   deleteShelf: (shelf: Shelf) => void;
   updateShelf: (shelf: Shelf, updatedProps: Partial<Shelf>) => void;
 }
@@ -22,6 +32,7 @@ type Props = {
 };
 
 const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
+  const stageRef = useRef<Konva.Stage>(null);
   const [activeShelf, setActiveShelf] = useState<Shelf | null>(null);
   const [shelves, setShelves] = useState<Shelves>(
     mapShelvesApiToUI(shelvesDefinition),
@@ -68,6 +79,7 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
     activeShelf,
     setActiveShelf,
     shelves,
+    stageRef,
     ...actions,
   };
 

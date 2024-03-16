@@ -1,33 +1,30 @@
 import { Line } from 'react-konva';
-import { Coordinates, Shelf as ShelfType } from '../../types';
-import { memo, useState } from 'react';
-import { Point } from '../Point';
+import { Shelf as ShelfType } from '../../types';
+import { memo } from 'react';
 import { DeleteButton } from '../DeleteButton';
-import { useShelf } from './shelf.hooks';
-import { useShelvesContext } from '../../Providers/useShelvesContext';
+import { useDraggablePoints, useShelf } from './shelf.hooks';
+import { ShelfPoints } from '../ShelfPoints';
 
 type Props = {
   shelf: ShelfType;
 };
 
 const ShelfInner = ({ shelf }: Props) => {
-  const [activePoint, setActivePoint] = useState<Coordinates | null>(null);
-  const { deleteShelf } = useShelvesContext();
-
   const {
     colorProps,
-    linePoints,
     deleteButtonPosition,
+    deleteShelf,
     isActive,
-    setActiveShelf,
-    updateShelfCoordinates,
-    submitShelf,
+    selectShelf,
   } = useShelf(shelf);
+  const { linePoints, updateShelfCoordinates, submitShelfChanges } =
+    useDraggablePoints(shelf);
 
   return (
     <>
       <Line
-        onClick={() => setActiveShelf(shelf)}
+        onClick={selectShelf}
+        onTouchEnd={selectShelf}
         closed
         points={linePoints}
         dash={[2, 10, 2]}
@@ -39,29 +36,19 @@ const ShelfInner = ({ shelf }: Props) => {
         <DeleteButton
           x={deleteButtonPosition[0]}
           y={deleteButtonPosition[1]}
-          onClick={() => deleteShelf(shelf)}
+          onClick={deleteShelf}
+          onTouchEnd={deleteShelf}
           color={shelf.color}
         />
       )}
 
-      {isActive &&
-        shelf.coordinates.map((point, index) => {
-          const [pointX, pointY] = point;
-
-          return (
-            <Point
-              key={`${pointX}_${pointY}`}
-              color={shelf.color}
-              coordinates={point}
-              isActive={activePoint === point}
-              onDragStart={() => setActivePoint(point)}
-              onDragMove={({ evt }) => {
-                updateShelfCoordinates([evt.offsetX, evt.offsetY], index);
-              }}
-              onDragEnd={submitShelf}
-            />
-          );
-        })}
+      {isActive && (
+        <ShelfPoints
+          shelf={shelf}
+          onChange={updateShelfCoordinates}
+          onSubmit={submitShelfChanges}
+        />
+      )}
     </>
   );
 };

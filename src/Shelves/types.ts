@@ -1,6 +1,7 @@
 import Konva from 'konva';
 
 export type KonvaMouseEvent = Konva.KonvaEventObject<MouseEvent>;
+export type KonvaTouchEvent = Konva.KonvaEventObject<TouchEvent>;
 
 export type Coordinates = [number, number];
 export type ShelvesDefinition = Coordinates[][];

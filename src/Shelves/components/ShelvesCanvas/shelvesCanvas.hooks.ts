@@ -1,12 +1,18 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import Konva from 'konva';
 import { getRandomColor } from '../../../utils/utils';
 import { getShelfCoords } from './shelvesCanvas.utils';
-import { Coordinates, KonvaMouseEvent, Shelf } from '../../types';
+import {
+  Coordinates,
+  KonvaMouseEvent,
+  KonvaTouchEvent,
+  Shelf,
+} from '../../types';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
+import { getCursorPosition } from '../../utils/utils';
 
 export const useShelvesCanvas = () => {
-  const { addShelf, setActiveShelf } = useShelvesContext();
+  const { addShelf, setActiveShelf, stageRef } = useShelvesContext();
   const [initialPointPosition, setInitialPointPosition] = useState<
     [number, number] | null
   >(null);
@@ -14,7 +20,6 @@ export const useShelvesCanvas = () => {
   const [shelfDraftProps, setShelfDraftProps] =
     useState<Konva.RectConfig | null>(null);
   const colorOpacity40 = `${color}40`;
-  const canvasRef = useRef(null);
 
   const drawShelfDraft = (
     [initX, initY]: Coordinates,
@@ -32,14 +37,14 @@ export const useShelvesCanvas = () => {
     });
   };
 
-  const onMouseDown = (event: KonvaMouseEvent) => {
-    if (event.target === canvasRef.current) {
-      setInitialPointPosition([event.evt.offsetX, event.evt.offsetY]);
+  const startDrawingShelf = (event: KonvaMouseEvent | KonvaTouchEvent) => {
+    if (event.target === stageRef.current) {
+      setInitialPointPosition(getCursorPosition(event, stageRef.current));
       setActiveShelf(null);
     }
   };
 
-  const onMouseUp = () => {
+  const submitShelfDraft = () => {
     if (initialPointPosition) {
       const coordinates = getShelfCoords(shelfDraftProps);
       if (coordinates) {
@@ -56,20 +61,20 @@ export const useShelvesCanvas = () => {
     }
   };
 
-  const onMouseMove = (event: KonvaMouseEvent) => {
-    if (initialPointPosition) {
-      drawShelfDraft(initialPointPosition, [
-        event.evt.offsetX,
-        event.evt.offsetY,
-      ]);
+  const redrawShelfDraft = (event: KonvaMouseEvent | KonvaTouchEvent) => {
+    if (initialPointPosition && stageRef.current) {
+      drawShelfDraft(
+        initialPointPosition,
+        getCursorPosition(event, stageRef.current),
+      );
     }
   };
 
   return {
-    canvasRef,
-    onMouseDown,
-    onMouseUp,
-    onMouseMove,
+    stageRef,
+    startDrawingShelf,
+    submitShelfDraft,
+    redrawShelfDraft,
     shelfDraftProps,
   };
 };

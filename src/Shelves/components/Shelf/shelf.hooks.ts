@@ -1,45 +1,36 @@
 import { useEffect, useState } from 'react';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
-import { Coordinates, Shelf } from '../../types';
+import {
+  Coordinates,
+  KonvaMouseEvent,
+  KonvaTouchEvent,
+  Shelf,
+} from '../../types';
 import { getShelfColors } from './shelf.utils';
+import { getCursorPosition } from '../../utils/utils';
 
 const DELETE_TRIGGERS = ['Delete', 'Backspace'];
 
 export const useShelf = (shelf: Shelf) => {
-  const { activeShelf, setActiveShelf, updateShelf } = useShelvesContext();
+  const { activeShelf, setActiveShelf, deleteShelf } = useShelvesContext();
   useShelfEvents(shelf);
 
-  const [coordinates, setCoordinates] = useState<Coordinates[]>(
-    shelf.coordinates,
-  );
-  const linePoints = coordinates.flat();
   const [deleteButtonPosition] = [...shelf.coordinates].sort(
     ([aX, aY], [bX, bY]) => aY - bY || bX - aX,
   );
   const isActive = activeShelf === shelf;
   const colorProps = getShelfColors(isActive, shelf.color);
 
-  const updateShelfCoordinates = (updatedPoint: Coordinates, index: number) => {
-    setCoordinates((prevState) => {
-      const updatedCoordinates = [...prevState];
-      updatedCoordinates[index] = updatedPoint;
-
-      return updatedCoordinates;
-    });
-  };
-
-  const submitShelf = () => {
-    updateShelf(shelf, { coordinates });
+  const selectShelf = () => {
+    setActiveShelf(shelf);
   };
 
   return {
     colorProps,
-    linePoints,
     deleteButtonPosition,
     isActive,
-    setActiveShelf,
-    updateShelfCoordinates,
-    submitShelf,
+    selectShelf,
+    deleteShelf: () => deleteShelf(shelf),
   };
 };
 
@@ -64,4 +55,37 @@ const useShelfEvents = (shelf: Shelf) => {
 
     return () => document.removeEventListener('keydown', onKeyPress);
   }, [deleteShelf, isActive, setActiveShelf, shelf]);
+};
+
+export const useDraggablePoints = (shelf: Shelf) => {
+  const { stageRef } = useShelvesContext();
+  const { updateShelf } = useShelvesContext();
+
+  const updateShelfCoordinates = (
+    event: KonvaMouseEvent | KonvaTouchEvent,
+    index: number,
+  ) => {
+    if (!stageRef.current) {
+      return;
+    }
+
+    const coords = getCursorPosition(event, stageRef.current);
+    setCoordinates((prevState) => {
+      const updatedCoordinates = [...prevState];
+      updatedCoordinates[index] = coords;
+
+      return updatedCoordinates;
+    });
+  };
+
+  const [coordinates, setCoordinates] = useState<Coordinates[]>(
+    shelf.coordinates,
+  );
+  const linePoints = coordinates.flat();
+
+  return {
+    linePoints,
+    updateShelfCoordinates,
+    submitShelfChanges: () => updateShelf(shelf, { coordinates }),
+  };
 };
