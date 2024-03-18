@@ -9,9 +9,9 @@ function App() {
     <Shelves
       imgUrl={exampleImageUrl}
       shelvesDefinition={[]}
-      onChange={(value: [number, number][][]) =>
-        console.table(value.map((v) => JSON.stringify(v)))
-      }
+      onChange={(value: [number, number][][]) => {
+        console.table(value.map((v) => JSON.stringify(v)));
+      }}
     />
   );
 }

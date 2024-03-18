@@ -3,6 +3,7 @@ import Konva from 'konva';
 import { getShelfCoords } from './shelvesCanvas.utils';
 import {
   Coordinates,
+  Dimensions,
   KonvaMouseEvent,
   KonvaTouchEvent,
   Shelf,
@@ -128,9 +129,11 @@ export const useShelvesZoom = (zoomFactor?: number) => {
 export const useBackgroundImage = (
   containerRef: RefObject<Konva.Stage>,
   imageUrl: string,
+  dimensions: Dimensions,
 ) => {
   const [imageEl, setImageEl] = useState<HTMLImageElement | null>(null);
   const layerRef = useRef<Konva.Layer | null>(null);
+  const [isBackgroundInitialized, setIsBackgroundInitialized] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -144,9 +147,8 @@ export const useBackgroundImage = (
   }, [containerRef, imageUrl]);
 
   useEffect(() => {
-    if (!imageEl || !containerRef.current || !layerRef.current) return;
-    const containerPosition = containerRef.current.content.getClientRects();
-    const { width, height } = containerPosition[0];
+    if (!imageEl || !dimensions || !layerRef.current) return;
+    const { width, height } = dimensions;
 
     const scaleX = width / imageEl.width;
     const scaleY = height / imageEl.height;
@@ -164,7 +166,8 @@ export const useBackgroundImage = (
     });
 
     layerRef.current.add(backgroundRect);
-  }, [containerRef, imageEl]);
+    setIsBackgroundInitialized(true);
+  }, [dimensions, imageEl]);
 
-  return { layerRef };
+  return { layerRef, isBackgroundInitialized };
 };
