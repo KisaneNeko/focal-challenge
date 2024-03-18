@@ -12,3 +12,8 @@ export type Shelf = {
 };
 
 export type Shelves = Shelf[];
+
+export type Dimensions = {
+  height: number;
+  width: number;
+};

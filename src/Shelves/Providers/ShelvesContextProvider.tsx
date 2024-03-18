@@ -39,6 +39,10 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
   );
 
   useEffect(() => {
+    setShelves(mapShelvesApiToUI(shelvesDefinition));
+  }, [shelvesDefinition]);
+
+  useEffect(() => {
     onChange(mapShelvesUIToApi(shelves));
   }, [onChange, shelves]);
 
