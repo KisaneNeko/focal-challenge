@@ -7,9 +7,13 @@ export type Coordinates = [number, number];
 export type ShelvesDefinition = Coordinates[][];
 
 export type Shelf = {
-  id: string;
   coordinates: Coordinates[];
   color: string;
 };
 
 export type Shelves = Shelf[];
+
+export type Dimensions = {
+  height: number;
+  width: number;
+};

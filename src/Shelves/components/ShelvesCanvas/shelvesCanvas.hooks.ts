@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import { getShelfCoords } from './shelvesCanvas.utils';
 import {
@@ -9,7 +9,9 @@ import {
 } from '../../types';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
 import { getCursorPosition } from '../../utils/utils';
-import uniqueId from 'lodash/uniqueId';
+import { useCanvasZoom } from '../../hooks/useCanvasZoom';
+
+const BACKGROUND_IMAGE_SHAPE_NAME = 'background-image';
 
 export const useShelvesCanvas = () => {
   const { addShelf, setActiveShelf, stageRef } = useShelvesContext();
@@ -19,58 +21,6 @@ export const useShelvesCanvas = () => {
   const [shelfDraftProps, setShelfDraftProps] =
     useState<Konva.RectConfig | null>(null);
   const colorOpacity40 = `${color}40`;
-  const [previewImage, setPreviewImage] = useState<unknown | null>(null);
-
-  // zoom
-  const layerRef = useRef<Konva.Layer>(null);
-  const previewLayer = useRef<Konva.Layer | null>(null);
-  const zoomBoxRef = useRef<HTMLDivElement>(null);
-
-  // w/ copy items
-  // const updateZoomLayer = () => {
-  //   if (!zoomBoxRef.current || !layerRef.current) return;
-
-  //   const layer = layerRef.current;
-  //   if (previewLayer.current) {
-  //     previewLayer.current.destroy();
-  //   }
-  //   previewLayer.current = layerRef.current.clone({ listening: false });
-  //   zoomBoxRef.current.add(previewLayer.current);
-
-  //   layer.children.forEach((shape) => {
-  //     if (!previewLayer.current) return;
-
-  //     const clone = previewLayer.current.findOne('.' + shape.name());
-
-  //     if (clone) {
-  //       console.log('clone', clone);
-  //       clone.position(shape.position());
-  //     }
-  //   });
-  // };
-  // zoom end
-
-  // with creating image and copying that
-  const updateZoomLayer = async ([x, y]: Coordinates) => {
-    if (!layerRef.current || !zoomBoxRef.current) return;
-
-    try {
-      const image = await layerRef.current.toImage({
-        x: x - 50,
-        y: y - 50,
-        width: 100,
-        height: 100,
-        pixelRatio: 2,
-      });
-
-      console.log({ image });
-      setPreviewImage(image);
-      zoomBoxRef.current.appendChild(image as Node);
-    } catch (e) {
-      console.error('failed genrating image', e);
-    }
-  };
-  // zoom end
 
   const drawShelfDraft = (
     [initX, initY]: Coordinates,
@@ -89,7 +39,10 @@ export const useShelvesCanvas = () => {
   };
 
   const startDrawingShelf = (event: KonvaMouseEvent | KonvaTouchEvent) => {
-    if (event.target === stageRef.current) {
+    if (
+      stageRef.current &&
+      event.target.attrs.name === BACKGROUND_IMAGE_SHAPE_NAME
+    ) {
       setInitialPointPosition(getCursorPosition(event, stageRef.current));
       setActiveShelf(null);
     }
@@ -100,14 +53,11 @@ export const useShelvesCanvas = () => {
       const coordinates = getShelfCoords(shelfDraftProps);
       if (coordinates) {
         const newShelf: Shelf = {
-          id: uniqueId(),
           coordinates,
           color,
         };
         addShelf(newShelf);
         setColor(Konva.Util.getRandomColor());
-
-        updateZoomLayer(coordinates[0]);
       }
 
       setInitialPointPosition(null);
@@ -131,8 +81,86 @@ export const useShelvesCanvas = () => {
     submitShelfDraft,
     redrawShelfDraft,
     shelfDraftProps,
-    layerRef,
-    zoomBoxRef,
-    previewImage,
   };
+};
+
+export const useShelvesZoom = () => {
+  const { shelves, stageRef } = useShelvesContext();
+  const [isZoomBoxVisible, setIsZoomBoxVisible] = useState(false);
+  const { updateZoomLayer, zoomBoxRef } = useCanvasZoom(stageRef, 2);
+
+  // shelves definition are updated upon point drop
+  // I'm using this to reset zoom visibility
+  useEffect(() => {
+    setIsZoomBoxVisible(false);
+  }, [shelves]);
+
+  // I'm usually following the rule of not optimizing preemptively
+  // but in this case I want to make sure list items (Shelf components)
+  // are not re-rendered when not necessary
+  const onPointMove = useCallback(
+    (coords: Coordinates) => {
+      updateZoomLayer(coords);
+      setIsZoomBoxVisible(true);
+    },
+    [updateZoomLayer],
+  );
+
+  return {
+    isZoomBoxVisible,
+    onPointMove,
+    zoomBoxRef,
+  };
+};
+
+/**
+ * This hook is used to set canvas background image
+ * which makes sure the image is cloned when creating zoom box.
+ *
+ * @param containerRef
+ * @param imageUrl
+ * @returns
+ */
+export const useBackgroundImage = (
+  containerRef: RefObject<Konva.Stage>,
+  imageUrl: string,
+) => {
+  const [imageEl, setImageEl] = useState<HTMLImageElement | null>(null);
+  const layerRef = useRef<Konva.Layer | null>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const backgroundImage = new Image();
+    backgroundImage.src = imageUrl;
+    backgroundImage.crossOrigin = 'Anonymous';
+    backgroundImage.onload = () => {
+      setImageEl(backgroundImage);
+    };
+  }, [containerRef, imageUrl]);
+
+  useEffect(() => {
+    if (!imageEl || !containerRef.current || !layerRef.current) return;
+    const containerPosition = containerRef.current.content.getClientRects();
+    const { width, height } = containerPosition[0];
+
+    const scaleX = width / imageEl.width;
+    const scaleY = height / imageEl.height;
+    const scale = Math.max(scaleX, scaleY);
+
+    const backgroundRect = new Konva.Rect({
+      x: 0,
+      y: 0,
+      width,
+      height,
+      fillPatternImage: imageEl,
+      fillPatternScaleX: scale,
+      fillPatternScaleY: scale,
+      name: BACKGROUND_IMAGE_SHAPE_NAME,
+    });
+
+    layerRef.current.add(backgroundRect);
+  }, [containerRef, imageEl]);
+
+  return { layerRef };
 };

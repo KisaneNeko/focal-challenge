@@ -1,15 +1,17 @@
 import { Line } from 'react-konva';
-import { Shelf as ShelfType } from '../../types';
+import { Coordinates, Shelf as ShelfType } from '../../types';
 import { memo } from 'react';
 import { DeleteButton } from '../DeleteButton';
 import { useDraggablePoints, useShelf } from './shelf.hooks';
 import { ShelfPoints } from '../ShelfPoints';
 
-type Props = {
+export type Props = {
   shelf: ShelfType;
+  onPointMove: (coords: Coordinates) => void;
 };
 
-const ShelfInner = ({ shelf }: Props) => {
+const ShelfInner = (props: Props) => {
+  const { shelf } = props;
   const {
     colorProps,
     deleteButtonPosition,
@@ -18,7 +20,7 @@ const ShelfInner = ({ shelf }: Props) => {
     selectShelf,
   } = useShelf(shelf);
   const { linePoints, updateShelfCoordinates, submitShelfChanges } =
-    useDraggablePoints(shelf);
+    useDraggablePoints(props);
 
   return (
     <>
@@ -29,7 +31,6 @@ const ShelfInner = ({ shelf }: Props) => {
         points={linePoints}
         dash={[2, 10, 2]}
         strokeWidth={5}
-        name={`${shelf.id}_line`}
         {...colorProps}
       />
 

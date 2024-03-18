@@ -8,6 +8,7 @@ import {
 } from '../../types';
 import { getShelfColors } from './shelf.utils';
 import { getCursorPosition } from '../../utils/utils';
+import { Props } from './Shelf';
 
 const DELETE_TRIGGERS = ['Delete', 'Backspace'];
 
@@ -57,9 +58,12 @@ const useShelfEvents = (shelf: Shelf) => {
   }, [deleteShelf, isActive, setActiveShelf, shelf]);
 };
 
-export const useDraggablePoints = (shelf: Shelf) => {
+export const useDraggablePoints = ({ shelf, onPointMove }: Props) => {
   const { stageRef } = useShelvesContext();
   const { updateShelf } = useShelvesContext();
+  const [coordinates, setCoordinates] = useState<Coordinates[]>(
+    shelf.coordinates,
+  );
 
   const updateShelfCoordinates = (
     event: KonvaMouseEvent | KonvaTouchEvent,
@@ -73,14 +77,12 @@ export const useDraggablePoints = (shelf: Shelf) => {
     setCoordinates((prevState) => {
       const updatedCoordinates = [...prevState];
       updatedCoordinates[index] = coords;
+      onPointMove(coords);
 
       return updatedCoordinates;
     });
   };
 
-  const [coordinates, setCoordinates] = useState<Coordinates[]>(
-    shelf.coordinates,
-  );
   const linePoints = coordinates.flat();
 
   return {

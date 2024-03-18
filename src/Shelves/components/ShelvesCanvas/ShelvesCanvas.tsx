@@ -1,45 +1,62 @@
 import { Layer, Rect, Stage } from 'react-konva';
 import './shelvesCanvas.css';
-import { useShelvesCanvas } from './shelvesCanvas.hooks';
+import {
+  useBackgroundImage,
+  useShelvesCanvas,
+  useShelvesZoom,
+} from './shelvesCanvas.hooks';
 import { Shelf } from '../Shelf/Shelf';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
 
-export const ShelvesCanvas = () => {
+type Props = {
+  imageUrl: string;
+  dimensions: {
+    height: number;
+    width: number;
+  };
+};
+
+export const ShelvesCanvas = ({ imageUrl, dimensions }: Props) => {
   const { shelves } = useShelvesContext();
+
   const {
-    layerRef,
-    zoomBoxRef,
     stageRef,
     startDrawingShelf,
     submitShelfDraft,
     redrawShelfDraft,
     shelfDraftProps,
-    previewImage,
   } = useShelvesCanvas();
+
+  const { isZoomBoxVisible, onPointMove, zoomBoxRef } = useShelvesZoom();
+  const { layerRef } = useBackgroundImage(stageRef, imageUrl);
 
   return (
     <div className="shelves-canvas-container">
       <Stage
         ref={stageRef}
-        width={window.innerWidth}
-        height={window.innerHeight}
         onMouseDown={startDrawingShelf}
         onTouchStart={startDrawingShelf}
         onMouseUp={submitShelfDraft}
         onTouchEnd={submitShelfDraft}
         onMouseMove={redrawShelfDraft}
         onTouchMove={redrawShelfDraft}
+        {...dimensions}
       >
         <Layer ref={layerRef}>
           <>
             {shelfDraftProps && <Rect {...shelfDraftProps} />}
             {shelves.map((shelf) => (
-              <Shelf shelf={shelf} key={shelf.color} />
+              <Shelf
+                shelf={shelf}
+                key={shelf.color}
+                onPointMove={onPointMove}
+              />
             ))}
           </>
         </Layer>
       </Stage>
-      <div ref={zoomBoxRef}>dupa</div>
+
+      {isZoomBoxVisible && <div className="zoom-box" ref={zoomBoxRef} />}
     </div>
   );
 };
