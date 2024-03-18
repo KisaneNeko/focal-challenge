@@ -31,8 +31,17 @@ vi.mock('../../Providers/useShelvesContext', () => {
 });
 
 describe('ShelvesCanvas hooks', () => {
+  let eventMock: KonvaMouseEvent;
+
   beforeEach(() => {
     counter = 0;
+    eventMock = {
+      target: {
+        attrs: {
+          name: 'background-image',
+        },
+      },
+    } as unknown as KonvaMouseEvent;
   });
 
   afterAll(() => {
@@ -47,29 +56,31 @@ describe('ShelvesCanvas hooks', () => {
     expect(shelfDraftProps).toBe(null);
   });
 
-  it('should drop shelf focus when clicking on the Stage element', () => {
+  it('should not drop shelf focus', () => {
     const { result } = renderHook(() => useShelvesCanvas());
     const { startDrawingShelf } = result.current;
-    let eventMock = {
-      target: null,
+    eventMock = {
+      target: {
+        attrs: {
+          name: 'rectangle',
+        },
+      },
     } as unknown as KonvaMouseEvent;
 
     startDrawingShelf(eventMock);
     expect(setActiveShelfMock).not.toBeCalled();
+  });
 
-    eventMock = {
-      target: stageRefMock.current,
-    } as unknown as KonvaMouseEvent;
+  it('should drop shelf focus when clicking on the Stage element', () => {
+    const { result } = renderHook(() => useShelvesCanvas());
+    const { startDrawingShelf } = result.current;
+
     startDrawingShelf(eventMock);
     expect(setActiveShelfMock).toBeCalled();
   });
 
   it('should draw a shelf draft', async () => {
     const { result } = renderHook(() => useShelvesCanvas());
-    const eventMock = {
-      target: stageRefMock.current,
-    } as unknown as KonvaMouseEvent;
-
     act(() => result.current.startDrawingShelf(eventMock));
     act(() => result.current.redrawShelfDraft(eventMock));
 
