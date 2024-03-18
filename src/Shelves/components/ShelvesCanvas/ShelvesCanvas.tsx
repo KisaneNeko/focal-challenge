@@ -7,11 +7,14 @@ import { useShelvesContext } from '../../Providers/useShelvesContext';
 export const ShelvesCanvas = () => {
   const { shelves } = useShelvesContext();
   const {
+    layerRef,
+    zoomBoxRef,
     stageRef,
     startDrawingShelf,
     submitShelfDraft,
     redrawShelfDraft,
     shelfDraftProps,
+    previewImage,
   } = useShelvesCanvas();
 
   return (
@@ -27,7 +30,7 @@ export const ShelvesCanvas = () => {
         onMouseMove={redrawShelfDraft}
         onTouchMove={redrawShelfDraft}
       >
-        <Layer>
+        <Layer ref={layerRef}>
           <>
             {shelfDraftProps && <Rect {...shelfDraftProps} />}
             {shelves.map((shelf) => (
@@ -36,6 +39,7 @@ export const ShelvesCanvas = () => {
           </>
         </Layer>
       </Stage>
+      <div ref={zoomBoxRef}>dupa</div>
     </div>
   );
 };

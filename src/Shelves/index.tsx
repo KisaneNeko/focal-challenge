@@ -12,7 +12,7 @@ type Props = {
 export const Shelves = ({ shelvesDefinition, imgUrl, onChange }: Props) => (
   <ShelvesProvider shelvesDefinition={shelvesDefinition} onChange={onChange}>
     <div className="shelves-container">
-      <img src={imgUrl} alt="shelf image" />
+      {/* <img src={imgUrl} alt="shelf image" /> */}
       <ShelvesCanvas />
     </div>
   </ShelvesProvider>

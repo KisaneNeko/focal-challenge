@@ -2,7 +2,7 @@ import './App.css';
 import { Shelves } from './Shelves';
 
 const exampleImageUrl =
-  'https://c8.alamy.com/comp/BEMP56/volvic-bottled-water-on-supermarket-shelves-france-BEMP56.jpg';
+  'https://raw.githubusercontent.com/ahmetturkmen/CV-P1-2019-2020/master/data_/shelves/m1_shelf.jpg';
 
 function App() {
   return (

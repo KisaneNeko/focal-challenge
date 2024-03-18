@@ -29,6 +29,7 @@ const ShelfInner = ({ shelf }: Props) => {
         points={linePoints}
         dash={[2, 10, 2]}
         strokeWidth={5}
+        name={`${shelf.id}_line`}
         {...colorProps}
       />
 

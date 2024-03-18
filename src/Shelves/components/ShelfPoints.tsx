@@ -24,6 +24,7 @@ export const ShelfPoints = ({ shelf, onSubmit, onChange }: Props) => {
 
         return (
           <Circle
+            name={`${shelf.id}_point_${index}`}
             key={`${pointX}_${pointY}`}
             x={pointX}
             y={pointY}

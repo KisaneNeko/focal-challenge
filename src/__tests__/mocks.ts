@@ -11,6 +11,7 @@ export const shelvesDefinitionMock = [coordinatesMock];
 
 export const shelvesUIModelMock = [
   {
+    id: 'xyz',
     color: '#FFFFFF',
     coordinates: coordinatesMock,
   },

@@ -1,8 +1,8 @@
 .shelves-container {
   position: relative;
   overflow: hidden;
-  /* height: 1000px;
-  width: 1500px; */
+  height: 1000px;
+  width: 1500px;
 }
 
 .shelves-container img {
