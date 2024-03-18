@@ -42,17 +42,29 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
     setShelves(mapShelvesApiToUI(shelvesDefinition));
   }, [shelvesDefinition]);
 
-  useEffect(() => {
-    onChange(mapShelvesUIToApi(shelves));
-  }, [onChange, shelves]);
+  // useEffect(() => {
+  //   onChange(mapShelvesUIToApi(shelves));
+  // }, [onChange, shelves]);
+
+  const onShelvesChange = (state: Shelves) => {
+    onChange(mapShelvesUIToApi(state));
+  };
 
   const actions = useMemo(() => {
     const addShelf = (shelf: Shelf) => {
-      setShelves((prevState) => [...prevState, shelf]);
+      setShelves((prevState) => {
+        const updatedState = [...prevState, shelf];
+        onShelvesChange(updatedState);
+        return updatedState;
+      });
     };
 
     const deleteShelf = (shelf: Shelf) => {
-      setShelves((prevState) => prevState.filter((s) => s !== shelf));
+      setShelves((prevState) => {
+        const updatedState = prevState.filter((s) => s !== shelf);
+        onShelvesChange(updatedState);
+        return updatedState;
+      });
     };
 
     const updateShelf = (shelf: Shelf, updatedProps: Partial<Shelf>) => {
@@ -72,6 +84,7 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
           setActiveShelf(updatedShelf);
         }
 
+        onShelvesChange(updatedState);
         return updatedState;
       });
     };

@@ -8,6 +8,7 @@ import {
 import { Shelf } from '../Shelf/Shelf';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
 import { Dimensions } from '../../types';
+import { useEffect } from 'react';
 
 type Props = {
   imageUrl: string;
@@ -28,7 +29,18 @@ export const ShelvesCanvas = ({ imageUrl, dimensions, zoomFactor }: Props) => {
 
   const { isZoomBoxVisible, onPointMove, zoomBoxRef, zoomPosition } =
     useShelvesZoom(zoomFactor);
-  const { layerRef } = useBackgroundImage(stageRef, imageUrl);
+  const { layerRef, isBackgroundInitialized } = useBackgroundImage(
+    stageRef,
+    imageUrl,
+    dimensions,
+  );
+  // resize canvas when dimensions change (i.e. new imageUrl changes)
+  useEffect(() => {
+    if (dimensions && stageRef.current) {
+      stageRef.current.width(dimensions.width);
+      stageRef.current.height(dimensions.height);
+    }
+  }, [dimensions, stageRef]);
 
   return (
     <div className="shelves-canvas-container">
@@ -43,16 +55,19 @@ export const ShelvesCanvas = ({ imageUrl, dimensions, zoomFactor }: Props) => {
         {...dimensions}
       >
         <Layer ref={layerRef}>
-          <>
-            {shelfDraftProps && <Rect {...shelfDraftProps} />}
-            {shelves.map((shelf) => (
-              <Shelf
-                shelf={shelf}
-                key={shelf.color}
-                onPointMove={onPointMove}
-              />
-            ))}
-          </>
+          {/* canvas doesn't support z-index, so we need to make sure shelves are rendered after background */}
+          {isBackgroundInitialized && (
+            <>
+              {shelfDraftProps && <Rect {...shelfDraftProps} />}
+              {shelves.map((shelf) => (
+                <Shelf
+                  shelf={shelf}
+                  key={shelf.color}
+                  onPointMove={onPointMove}
+                />
+              ))}
+            </>
+          )}
         </Layer>
       </Stage>
 

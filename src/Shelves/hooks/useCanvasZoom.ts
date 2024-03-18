@@ -23,7 +23,7 @@ export const useCanvasZoom = (
 
   const updateZoomLayer = useCallback(
     async ([x, y]: Coordinates) => {
-      if (!sourceRef.current || !zoomBoxRef.current) return;
+      if (!sourceRef.current) return;
 
       if (x > window.innerWidth / 2) {
         setZoomPosition(POSITION_LEFT);
@@ -42,7 +42,7 @@ export const useCanvasZoom = (
         pixelRatio: zoomFactor,
       })) as Node;
 
-      zoomBoxRef.current.replaceChildren(image);
+      zoomBoxRef.current?.replaceChildren(image);
     },
     [sourceRef, zoomFactor],
   );
