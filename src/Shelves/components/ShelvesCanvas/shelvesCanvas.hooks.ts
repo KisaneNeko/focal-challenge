@@ -13,9 +13,8 @@ import { getCursorPosition } from '../../utils/utils';
 
 export const useShelvesCanvas = () => {
   const { addShelf, setActiveShelf, stageRef } = useShelvesContext();
-  const [initialPointPosition, setInitialPointPosition] = useState<
-    [number, number] | null
-  >(null);
+  const [initialPointPosition, setInitialPointPosition] =
+    useState<Coordinates | null>(null);
   const [color, setColor] = useState(getRandomColor());
   const [shelfDraftProps, setShelfDraftProps] =
     useState<Konva.RectConfig | null>(null);
@@ -72,6 +71,7 @@ export const useShelvesCanvas = () => {
 
   return {
     stageRef,
+    initialPointPosition,
     startDrawingShelf,
     submitShelfDraft,
     redrawShelfDraft,

@@ -6,14 +6,12 @@ export const getCursorPosition = (
   event: KonvaMouseEvent | KonvaTouchEvent,
   containerRef: Konva.Stage,
 ): Coordinates => {
-  console.log(event);
   if (isTouchEvent(event)) {
     const containerPosition = containerRef.content.getClientRects();
     const [touch] = event.evt.touches;
     const offsetX = touch.clientX - containerPosition[0].left;
     const offsetY = touch.clientY - containerPosition[0].top;
 
-    console.log([offsetX, offsetY]);
     return [offsetX, offsetY];
   }
 
