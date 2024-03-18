@@ -8,9 +8,15 @@ type Props = {
   shelvesDefinition: ShelvesDefinition;
   imgUrl: string;
   onChange: (shelvesDefinition: ShelvesDefinition) => void;
+  zoomFactor?: number;
 };
 
-export const Shelves = ({ shelvesDefinition, imgUrl, onChange }: Props) => {
+export const Shelves = ({
+  shelvesDefinition,
+  imgUrl,
+  onChange,
+  zoomFactor,
+}: Props) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [dimensions, setDimensions] = useState<Dimensions | null>(null);
@@ -37,7 +43,11 @@ export const Shelves = ({ shelvesDefinition, imgUrl, onChange }: Props) => {
           onLoad={() => setIsImageLoaded(true)}
         />
         {!!dimensions && (
-          <ShelvesCanvas imageUrl={imgUrl} dimensions={dimensions} />
+          <ShelvesCanvas
+            imageUrl={imgUrl}
+            dimensions={dimensions}
+            zoomFactor={zoomFactor}
+          />
         )}
       </div>
     </ShelvesProvider>

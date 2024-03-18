@@ -7,16 +7,15 @@ import {
 } from './shelvesCanvas.hooks';
 import { Shelf } from '../Shelf/Shelf';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
+import { Dimensions } from '../../types';
 
 type Props = {
   imageUrl: string;
-  dimensions: {
-    height: number;
-    width: number;
-  };
+  dimensions: Dimensions;
+  zoomFactor?: number;
 };
 
-export const ShelvesCanvas = ({ imageUrl, dimensions }: Props) => {
+export const ShelvesCanvas = ({ imageUrl, dimensions, zoomFactor }: Props) => {
   const { shelves } = useShelvesContext();
 
   const {
@@ -27,7 +26,8 @@ export const ShelvesCanvas = ({ imageUrl, dimensions }: Props) => {
     shelfDraftProps,
   } = useShelvesCanvas();
 
-  const { isZoomBoxVisible, onPointMove, zoomBoxRef } = useShelvesZoom();
+  const { isZoomBoxVisible, onPointMove, zoomBoxRef, zoomPosition } =
+    useShelvesZoom(zoomFactor);
   const { layerRef } = useBackgroundImage(stageRef, imageUrl);
 
   return (
@@ -56,7 +56,13 @@ export const ShelvesCanvas = ({ imageUrl, dimensions }: Props) => {
         </Layer>
       </Stage>
 
-      {isZoomBoxVisible && <div className="zoom-box" ref={zoomBoxRef} />}
+      {isZoomBoxVisible && (
+        <div
+          className="zoom-box"
+          ref={zoomBoxRef}
+          style={{ ...zoomPosition }}
+        />
+      )}
     </div>
   );
 };

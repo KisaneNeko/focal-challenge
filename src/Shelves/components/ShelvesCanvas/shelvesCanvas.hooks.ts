@@ -84,10 +84,13 @@ export const useShelvesCanvas = () => {
   };
 };
 
-export const useShelvesZoom = () => {
+export const useShelvesZoom = (zoomFactor?: number) => {
   const { shelves, stageRef } = useShelvesContext();
   const [isZoomBoxVisible, setIsZoomBoxVisible] = useState(false);
-  const { updateZoomLayer, zoomBoxRef } = useCanvasZoom(stageRef, 2);
+  const { updateZoomLayer, zoomBoxRef, zoomPosition } = useCanvasZoom(
+    stageRef,
+    zoomFactor,
+  );
 
   // shelves definition are updated upon point drop
   // I'm using this to reset zoom visibility
@@ -110,6 +113,7 @@ export const useShelvesZoom = () => {
     isZoomBoxVisible,
     onPointMove,
     zoomBoxRef,
+    zoomPosition,
   };
 };
 
