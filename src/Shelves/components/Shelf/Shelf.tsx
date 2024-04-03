@@ -7,6 +7,7 @@ import { ShelfPoints } from '../ShelfPoints';
 
 export type Props = {
   shelf: ShelfType;
+  containerRef: React.MutableRefObject<HTMLDivElement | null>;
   onPointMove: (coords: Coordinates) => void;
 };
 

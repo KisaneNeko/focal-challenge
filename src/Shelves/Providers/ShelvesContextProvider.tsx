@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   RefObject,
+  useCallback,
 } from 'react';
 import { Shelf, Shelves, ShelvesDefinition } from '../types';
 import { mapShelvesApiToUI, mapShelvesUIToApi } from '../utils/mappers';
@@ -42,13 +43,12 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
     setShelves(mapShelvesApiToUI(shelvesDefinition));
   }, [shelvesDefinition]);
 
-  // useEffect(() => {
-  //   onChange(mapShelvesUIToApi(shelves));
-  // }, [onChange, shelves]);
-
-  const onShelvesChange = (state: Shelves) => {
-    onChange(mapShelvesUIToApi(state));
-  };
+  const onShelvesChange = useCallback(
+    (state: Shelves) => {
+      onChange(mapShelvesUIToApi(state));
+    },
+    [onChange],
+  );
 
   const actions = useMemo(() => {
     const addShelf = (shelf: Shelf) => {
@@ -90,7 +90,7 @@ const ShelvesProvider = ({ children, shelvesDefinition, onChange }: Props) => {
     };
 
     return { addShelf, deleteShelf, updateShelf };
-  }, [activeShelf]);
+  }, [activeShelf, onShelvesChange]);
 
   const contextValue: ShelvesContextType = {
     activeShelf,

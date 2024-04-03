@@ -8,7 +8,7 @@ import {
 import { Shelf } from '../Shelf/Shelf';
 import { useShelvesContext } from '../../Providers/useShelvesContext';
 import { Dimensions } from '../../types';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type Props = {
   imageUrl: string;
@@ -18,6 +18,7 @@ type Props = {
 
 export const ShelvesCanvas = ({ imageUrl, dimensions, zoomFactor }: Props) => {
   const { shelves } = useShelvesContext();
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const {
     stageRef,
@@ -43,7 +44,7 @@ export const ShelvesCanvas = ({ imageUrl, dimensions, zoomFactor }: Props) => {
   }, [dimensions, stageRef]);
 
   return (
-    <div className="shelves-canvas-container">
+    <div className="shelves-canvas-container" ref={containerRef}>
       <Stage
         ref={stageRef}
         onMouseDown={startDrawingShelf}
@@ -64,6 +65,7 @@ export const ShelvesCanvas = ({ imageUrl, dimensions, zoomFactor }: Props) => {
                   shelf={shelf}
                   key={shelf.color}
                   onPointMove={onPointMove}
+                  containerRef={containerRef}
                 />
               ))}
             </>
